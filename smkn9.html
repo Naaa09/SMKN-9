@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMKN 9 Medan Shop</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {margin:0; font-family:'Poppins',sans-serif; background:#f5f6fa;}
+
+header {
+    background: url('header.jpeg') center/cover no-repeat;
+    color:white;
+    text-align:center;
+    padding:20px;
+    border-radius:0 0 10px 10px;
+    position:relative;
+}
+
+header h1, header h3,header p {
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+}
+
+.cart-icon {
+    position:absolute;
+    top:20px;
+    right:20px;
+    background:white;
+    color:black;
+    padding:8px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* BANNER RESPONSIVE */
+.banner {
+ display:flex;
+ justify-content:center;
+ margin-top:20px;
+}
+.banner img {
+    width:90%;
+    max-width:900px;
+    aspect-ratio:16/6;
+    object-fit:cover;
+    border-radius:20px;
+}
+
+/* KATEGORI */
+.kategori {text-align:center; margin:20px;}
+.kategori button {
+    padding:10px;
+    margin:5px;
+    border:none;
+    border-radius:20px;
+    background:#333;
+    color:white;
+    cursor:pointer;
+}
+
+/* PRODUK */
+.produk-container {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+    padding:20px;
+}
+
+.produk {
+    background:white;
+    padding:10px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.produk img {
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+/* tombol */
+.btn-group {
+    display:flex;
+    gap:5px;
+}
+
+.btn-group button {
+    flex:1;
+    padding:8px;
+    border:none;
+    background:#667eea;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* CART */
+#cart-box {
+    display:none;
+    position:fixed;
+    right:20px;
+    top:70px;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    width:250px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* CHECKOUT */
+#checkout {
+    display:none;
+    max-width:400px;
+    margin:20px auto;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+}
+
+input, select {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+/* POPUP */
+#popup {
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.5);
+    justify-content:center;
+    align-items:center;
+}
+
+.popup-box {
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+}
+
+/* NOTIF */
+#notif {
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:#333;
+color:white;
+padding:10px 20px;
+border-radius:20px;
+display:none;
+}
+
+/* RESPONSIVE HP */
+@media (max-width:600px){
+    .banner img {
+        aspect-ratio:16/9;
+        width:95%;
+    }
+
+    .produk-container {
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>SMKN 9 Shop</h1>
+<h3>Toko Perhiasan Modern</h3>
+<p> Temukan Perhiasan Classy Dan Mewah disini!</p>
+
+<div class="cart-icon" onclick="toggleCart()">
+🛒 <span id="cart-count">0</span>
+</div>
+</header>
+
+<div class="banner">
+<img src="headpic.jpeg">
+</div>
+
+<div class="kategori">
+<button onclick="tampil('anting')">Anting</button>
+<button onclick="tampil('gelang')">Gelang</button>
+<button onclick="tampil('kalung')">Kalung</button>
+</div>
+
+<div id="produk" class="produk-container"></div>
+
+<!-- CART -->
+<div id="cart-box">
+<h3>Keranjang</h3>
+<div id="cart-items"></div>
+<p><b>Total: Rp <span id="total">0</span></b></p>
+<button onclick="checkoutCart()">Checkout</button>
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkout">
+<h2>Checkout</h2>
+<div id="detail"></div>
+
+<input type="text" id="alamat" placeholder="Masukkan alamat">
+
+<select id="pembayaran">
+<option value="">-- Pilih Pembayaran --</option>
+<option>COD</option>
+<option>Transfer</option>
+</select>
+
+<button onclick="pesan()">Pesan Sekarang</button>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+<div class="popup-box">
+<h3>Pesanan anda telah berhasil 🎉</h3>
+<button onclick="tutup()">OK</button>
+</div>
+</div>
+
+<div id="notif">Produk ditambahkan ke keranjang 🛒</div>
+
+<script>
+const data = {
+anting: [
+{nama:"Anting Emas Spiral", harga:470000, img:"a1.jpeg"},
+{nama:"Anting Pita", harga:250000, img:"a2.jpeg"},
+{nama:"Anting Emas Polos", harga:750000, img:"a3.jpeg"},
+{nama:"Anting Liontin Emas", harga:350000, img:"a4.jpeg"},
+{nama:"Anting Permata ", harga:285000, img:"a5.jpeg"}
+],
+gelang: [
+{nama:"Gelang Hati", harga:1200000, img:"g1.jpeg"},
+{nama:"Gelang Permata", harga:200000, img:"g2.jpeg"},
+{nama:"Gelang Emas 3 Mata", harga:350000, img:"g3.jpeg"},
+{nama:"Gelang Infinity Heart", harga:400000, img:"g4.jpeg"},
+{nama:"Gelang Silver Hati", harga:370000, img:"g5.jpeg"}
+],
+kalung: [
+{nama:"Kalung Two Hearts", harga:2000000, img:"k1.jpeg"},
+{nama:"Kalung Hati", harga:450000, img:"k2.jpeg"},
+{nama:"Kalung Permata", harga:1500000, img:"k3.jpeg"},
+{nama:"Kalung Emas", harga:800000, img:"k4.jpeg"},
+{nama:"Kalung Liontin Emas", harga:900000, img:"k5.jpeg"}
+]
+};
+
+let cart=[];
+
+function tampil(kategori){
+let html="";
+data[kategori].forEach(p=>{
+html+=`
+<div class="produk">
+<img src="${p.img}">
+<h3>${p.nama}</h3>
+<p>Rp ${p.harga.toLocaleString()}</p>
+
+<div class="btn-group">
+<button onclick='beli(${JSON.stringify(p)})'>Beli</button>
+<button onclick='tambahKeranjang(${JSON.stringify(p)})'>+ Keranjang</button>
+</div>
+
+</div>`;
+});
+document.getElementById("produk").innerHTML=html;
+}
+
+function tambahKeranjang(p){
+let item = cart.find(i=>i.nama===p.nama);
+if(item){item.qty++;}
+else{cart.push({...p,qty:1});}
+updateCart();
+
+let n=document.getElementById("notif");
+n.style.display="block";
+setTimeout(()=>{n.style.display="none";},1500);
+}
+
+function updateCart(){
+document.getElementById("cart-count").innerText=cart.length;
+
+let html="";
+cart.forEach((item,i)=>{
+html+=`
+<div>
+<input type="checkbox" onchange="hitungTotal()" data-index="${i}">
+${item.nama} (x${item.qty})<br>
+Rp ${(item.harga*item.qty).toLocaleString()}
+</div><hr>`;
+});
+document.getElementById("cart-items").innerHTML=html;
+}
+
+function hitungTotal(){
+let total=0;
+document.querySelectorAll("#cart-items input:checked").forEach(cb=>{
+let i=cb.dataset.index;
+total+=cart[i].harga*cart[i].qty;
+});
+document.getElementById("total").innerText=total.toLocaleString();
+}
+
+function toggleCart(){
+let box=document.getElementById("cart-box");
+box.style.display=box.style.display==="none"?"block":"none";
+}
+
+function checkoutCart(){
+let checked=document.querySelectorAll("#cart-items input:checked");
+if(checked.length===0){alert("Pilih barang dulu!");return;}
+
+let html="";
+let total=0;
+
+checked.forEach(cb=>{
+let i=cb.dataset.index;
+let item=cart[i];
+html+=`<p>${item.nama} (x${item.qty}) - Rp ${(item.harga*item.qty).toLocaleString()}</p>`;
+total+=item.harga*item.qty;
+});
+
+html+=`<hr><b>Total: Rp ${total.toLocaleString()}</b>`;
+
+document.getElementById("detail").innerHTML=html;
+document.getElementById("checkout").style.display="block";
+toggleCart();
+
+document.getElementById("checkout").scrollIntoView({behavior:"smooth"});
+}
+
+function beli(p){
+document.getElementById("detail").innerHTML=
+`<p>${p.nama} - Rp ${p.harga.toLocaleString()}</p>`;
+document.getElementById("checkout").style.display="block";
+document.getElementById("checkout").scrollIntoView({behavior:"smooth"});
+}
+
+function pesan(){
+let alamat=document.getElementById("alamat").value;
+let bayar=document.getElementById("pembayaran").value;
+
+if(alamat===""){alert("Isi alamat!");return;}
+if(bayar===""){alert("Pilih pembayaran!");return;}
+
+document.getElementById("popup").style.display="flex";
+}
+
+function tutup(){
+document.getElementById("popup").style.display="none";
+document.getElementById("checkout").style.display="none";
+}
+</script>
+
+</body>
+</html>
